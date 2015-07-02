@@ -63,9 +63,11 @@ Domain Path: /
 			}
 		}
 
+		$margin = get_option('WPYoutubeFeed_margin');
+
 		//Finally, output the embed links to the unique videos
 		foreach($videoIds as $videoId) {
-			$content .= '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe>';
+			$content .= '<iframe style = "margin-top: ' . $margin . 'px;" width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe>';
 		}
 
 		return $content;
