@@ -15,6 +15,14 @@ $fields[] = array(
 	'label' => 'Channel URL'
 );
 
+$fields[] = array(
+	'type' => 'text',
+	'name' => 'WPYoutubeFeed_margin',
+	'label' => 'Video top margin (px)'
+);
+
+add_option('WPYoutubeFeed_margin', 0);
+
 $settings['General']['fields'] = $fields;
 
 new OptionPageBuilderSingle($page, $settings);

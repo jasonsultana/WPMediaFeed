@@ -14,6 +14,8 @@ WPYoutubeFeed is a simple plugin that let’s you load a feed of videos automati
 
 Use this plugin to load a feed of videos from your Youtube channel and display them (playable) on a Wordpress page. It works by downloading the HTML of your youtube channel, searching for video links and outputting the standard Youtube video embed code for each of them. Theoretically, it could work for playlists or subscriptions too - basically any page that contains a series of links to Youtube videos. 
 
+This plugin requires the Wordpress-Settings-Library package to be installed in the plugins directory.
+
 
 == Installation ==
 
