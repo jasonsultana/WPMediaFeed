@@ -9,9 +9,15 @@ Author URI:  https://wordpress.org/support/profile/kowboykoder
 Text Domain: 
 Domain Path: /
  */
+<<<<<<< HEAD
 	function WPYoutubeFeed_init() {
 		defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
+=======
+	defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+	
+	function autoload() {
+>>>>>>> origin/master
 		spl_autoload_register(function($class) {
 			$dir = dirname(__FILE__) . $class . '.class.php';
 
@@ -49,7 +55,11 @@ Domain Path: /
 		$content = str_replace("[WPYoutubeFeed]", "", $content);
 
 		//First, download the channel HTML from youtube
+<<<<<<< HEAD
 		require_once dirname(__FILE__) . '/HTTPRequest.class.php';
+=======
+		require_once dirname(__FILE__) . '/core/HTTPRequest.class.php';
+>>>>>>> origin/master
 		$req = new HTTPRequest($url);
 		$html = $req->DownloadToString();
 
@@ -72,6 +82,11 @@ Domain Path: /
 			}
 		}
 
+<<<<<<< HEAD
+=======
+		$margin = get_option('WPYoutubeFeed_margin');
+
+>>>>>>> origin/master
 		//Finally, output the embed links to the unique videos
 		foreach($videoIds as $videoId) {
 			$content .= '<iframe style = "margin-top: ' . $margin . 'px;" width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe>';
