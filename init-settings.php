@@ -17,8 +17,7 @@ $fields[] = array(
 
 $fields[] = array(
 	'type' => 'text',
-	'name' => 'WPYoutubeFeed_margin',
-	'label' => 'Video top margin (px)'
+	'name' => ''
 );
 
 add_option('WPYoutubeFeed_margin', 0);

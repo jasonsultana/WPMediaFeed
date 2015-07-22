@@ -1,8 +1,11 @@
 <?php
 	/*
-	Plugin Name: WPYoutubeFeed
+	Plugin Name: WPMediaFeed
 	Plugin URI:  
-	Description: A Youtube Feed plugin for Wordpress. Use [WPYoutubeFeed] on any page or post where you want to load your Youtube feed.
+	Description: A Media Feed plugin for Wordpress that can display a feed of your Youtube and / or SoundCloud account. 
+				 Use [WPMediaFeed-Youtube] on any page or post where you want to load your Youtube feed and [WPMediaFeed-Soundcloud] on any page or post where
+				 you want to load your SoundCloud feed. Both feeds can not be shown on the same page / post.
+
 	Version:     0.1-alpha
 	Author:      Jason Sultana
 	Author URI:  https://wordpress.org/support/profile/kowboykoder
@@ -10,7 +13,7 @@
 	Domain Path: /
 	 */
 
-	function WPYoutubeFeed_init() {
+	function WPMediaFeed_init() {
 		defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 	
 		spl_autoload_register(function($class) {
@@ -37,48 +40,66 @@
 	}
 	WPYoutubeFeed_init();
 
-	function WPYoutubeFeed_content_filter($content) {
-		$url = get_option('WPYoutubeFeed_channel');
+	function WPMediaFeed_content_filter($content) {
+		$url = "";
+		$delimiter = "";
+		$start = 0;
+		$mode = "";
+		$dest_url = "";
+
+		//Some validation and filtering
+		if(strpos($content, "[WPMediaFeed-Youtube]") !== false) {
+			$content = str_replace("[WPMediaFeed-Youtube]", "", $content);
+			$url = get_option('WPMediaFeed-Youtube-Channel');
+			$delimiter = "watch?v=";
+			$start = 1;	//For YT, skip the first record. It's garbage.
+			$dest_url = "http://www.youtube.com/watch?v=";
+			$mode = "youtube";
+		}
+		else if(strpos($content, "[WPMediaFeed-Soundcloud]") !== false) {
+			$content = str_replace("[WPMediaFeed-Soundcloud]", "", $content);
+			$url = get_option('WPMediaFeed-Soundcloud-Channel');
+			$delimiter = '<a class="sound__coverArt" href="';
+			$dest_url = "https://w.soundcloud.com/player/?url=" . $url;
+			$mode = "soundcloud";
+		}
+		else {
+			//Only get the feed if the shortcode is present.
+			return $content;
+		}
 
 		if(!$url || $url == "")
 			return $content;
 
-		//Only get the feed if the shortcode is present.
-		if(strpos($content, "[WPYoutubeFeed]") === false)
-			return $content;
-
-		$content = str_replace("[WPYoutubeFeed]", "", $content);
-
-		//First, download the channel HTML from youtube
+		//Download the channel HTML
 		require_once dirname(__FILE__) . '/HTTPRequest.class.php';
 		$req = new HTTPRequest($url);
 		$html = $req->DownloadToString();
 
-		//Next, parse it to get the video IDs
-		$videoParts = explode("watch?v=", $html);
-		$videoIds = array();
+		//Next, parse it to get the media IDs
+		$mediaParts = explode($delimiter, $html);
+		$mediaIds = array();
 
 		//skip the first one - it's bogus
-		for($i = 1; $i < sizeof($videoParts); $i++) {
-			$part = $videoParts[$i];
-			$videoId = strstr($part, "\"", true);
+		for($i = $start; $i < sizeof($mediaParts); $i++) {
+			$part = $mediaParts[$i];
+			$mediaId = strstr($part, "\"", true);
 
 			//echo "VideoId: $videoId , length: " . strlen($videoId) . "<br>";
 
 			//Youtube videoIds should always be 11 chars long, but let's keep it open for future compatibility
-			if( strlen($videoId) > 10 ) {
-				if(!in_array($videoId, $videoIds)) {
-					array_push($videoIds, $videoId);
+			if( ($mode == "youtube" && strlen($mediaId) > 10 ) || $mode == "soundcloud") {
+				if(!in_array($mediaId, $mediaIds)) {
+					array_push($mediaIds, $mediaId);
 				}
 			}
 		}
-		$margin = get_option('WPYoutubeFeed_margin');
 
 		//Finally, output the embed links to the unique videos
-		foreach($videoIds as $videoId) {
-			$content .= '<iframe style = "margin-top: ' . $margin . 'px;" width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe>';
+		foreach($mediaIds as $mediaId) {
+			$content .= '[embed]' . $dest_url . $mediaId . '[/embed]';
 		}
 
 		return $content;
 	}
-	add_filter( 'the_content', 'WPYoutubeFeed_content_filter');
+	add_filter( 'the_content', 'WPMediaFeed_content_filter');
